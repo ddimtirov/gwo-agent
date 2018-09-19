@@ -1,0 +1,43 @@
+plugins {
+    id 'maven-publish'
+    id 'java-library'
+}
+
+group = 'io.github.ddimtirov.gradle'
+version = System.getenv('VERSION') ?: version
+
+repositories.jcenter()
+dependencies.implementation 'net.bytebuddy:byte-buddy:1.8.22'
+
+compileJava{
+    targetCompatibility = 1.6
+    sourceCompatibility = 1.6
+    options.compilerArgs << '-Xlint:-options' // suppress JDK8 complaining that Java6 target is getting remover
+}
+
+jar {
+    manifest.attributes(
+            'Premain-Class': 'io.github.ddimtirov.gradle.wrapperoverride.GradleWrapperOverrideAgent',
+            'Can-Redefine-Classes': true,
+            'Can-Retransform-Classes': true
+    )
+    manifest.attributes('io.github.ddimtirov.gradle.wrapperoverride',
+            'Specification-Title': 'Gradle Wrapper Override Agent',
+            'Specification-Version': version ?: 'UNKNOWN',
+            'Specification-Vendor': 'http://github.com/ddimtirov/gwo-agent',
+            'Implementation-Title': "$project.group:$project.name",
+            'Implementation-Version': System.getenv('GIT_COMMIT') ?: 'UNKNOWN',
+            'Implementation-Vendor': System.getenv('JITPACK') ? 'https://jitpack.io' : 'UNKNOWN'
+    )
+
+    from { zipTree(files(configurations.runtimeClasspath).singleFile) }// TODO: use the shadow plugin to relocate bytebuddy
+}
+
+
+publishing{
+    publications {
+        agent(MavenPublication) {
+            from components.java
+        }
+    }
+}
