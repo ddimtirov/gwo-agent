@@ -1,6 +1,7 @@
 plugins {
     id 'maven-publish'
     id 'java-library'
+    id "com.github.johnrengelman.shadow" version "2.0.4"
 }
 
 group = 'io.github.ddimtirov.gradle'
@@ -29,15 +30,18 @@ jar {
             'Implementation-Version': System.getenv('GIT_COMMIT') ?: 'UNKNOWN',
             'Implementation-Vendor': System.getenv('JITPACK') ? 'https://jitpack.io' : 'UNKNOWN'
     )
-
-    from { zipTree(files(configurations.runtimeClasspath).singleFile) }// TODO: use the shadow plugin to relocate bytebuddy
+    enabled = false
 }
-
+shadowJar {
+    classifier = null
+    relocate 'net.bytebuddy', 'relocated.wrapperoverride.bytebuddy'
+}
+assemble.dependsOn shadowJar
 
 publishing{
     publications {
-        agent(MavenPublication) {
-            from components.java
+        agent(MavenPublication) { publication ->
+            project.shadow.component(publication)
         }
     }
 }
