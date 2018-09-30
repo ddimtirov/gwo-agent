@@ -1,7 +1,7 @@
 plugins {
     id 'maven-publish'
     id 'java-library'
-    id "com.github.johnrengelman.shadow" version "2.0.4"
+    id "com.github.johnrengelman.shadow" version "4.0.0"
 }
 
 group = 'io.github.ddimtirov.gradle'
@@ -10,11 +10,9 @@ version = System.getenv('VERSION') ?: version
 repositories.jcenter()
 dependencies.implementation 'net.bytebuddy:byte-buddy:1.8.22'
 
-compileJava{
-    targetCompatibility = 1.6
-    sourceCompatibility = 1.6
-    options.compilerArgs << '-Xlint:-options' // suppress JDK8 complaining that Java6 target is getting remover
-}
+targetCompatibility = 1.6
+sourceCompatibility = 1.6
+compileJava.options.compilerArgs.add('-Xlint:-options')
 
 jar {
     manifest.attributes(
@@ -32,11 +30,14 @@ jar {
     )
     enabled = false
 }
+
 shadowJar {
     classifier = null
     relocate 'net.bytebuddy', 'relocated.wrapperoverride.bytebuddy'
+    minimize()
+    preserveFileTimestamps = false
+    assemble.dependsOn it
 }
-assemble.dependsOn shadowJar
 
 publishing{
     publications {
