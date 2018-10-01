@@ -10,7 +10,7 @@ giving you extra control over the build distribution, without modifying the chec
 All you need is to download the latest version  [![Release](https://jitpack.io/v/ddimtirov/gwo-agent.svg)](https://jitpack.io/#ddimtirov/gwo-agent) or use `curl`:
 
 ````bash
-curl -o gwo-agent.jar https://jitpack.io/com/github/ddimtirov/gwo-agent/1.1.0/gwo-agent-1.1.0.jar
+curl -o gwo-agent.jar https://jitpack.io/com/github/ddimtirov/gwo-agent/1.2.0/gwo-agent-1.2.0.jar
 ````
 
 And inject the agent into the Gradle wrapper using environment variable such as `GRADLE_OPTS`:
